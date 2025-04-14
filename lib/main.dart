@@ -70,7 +70,43 @@ class _WeatherScreenState extends State<WeatherScreen> {
     });
   }
 
-  
+    /// Fetch weather for entered city
+  Future<void> _getWeatherByCity() async {
+    final city = cityController.text.trim();
+    if (city.isEmpty) return;
+
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
+    try {
+      final apiKey = dotenv.env['OPENWEATHER_API_KEY']!;
+      final data = await WeatherService.fetchWeatherByCity(city, apiKey);
+
+      setState(() {
+        weatherData = data;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  /// Get appropriate weather icon based on condition
+  String _getWeatherIcon(String condition) {
+    if (condition.contains("cloud")) return "☁️";
+    if (condition.contains("rain")) return "🌧️";
+    if (condition.contains("clear")) return "☀️";
+    if (condition.contains("snow")) return "❄️";
+    return "🌈";
+  }
+
 
   @override
   void initState() {
